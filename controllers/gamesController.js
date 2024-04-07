@@ -69,7 +69,7 @@ router.put("/games/:id", (req, res) => {
             let {title, price, year } = req.body
 
             if(title != undefined){
-                if(title === "" || typeof (title) != "string"){
+                if(title === "" || typeof(title) !== "string"){
                     res.sendStatus(204)
                 }
                 game.title = title
