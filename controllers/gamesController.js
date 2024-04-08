@@ -6,7 +6,9 @@ router.get("/", (req, res) => {
 })
 
 router.get("/games", (req, res) => {
-    res.json(db.games)
+    db.findAll().then(games => {
+        res.json(games)
+    })
 })
 
 router.get("/games/:id", (req, res) => {
@@ -14,32 +16,31 @@ router.get("/games/:id", (req, res) => {
         res.sendStatus(400)
     } else {
         let id = parseInt(req.params.id)
-        let game = db.games.find(g => g.id == id)
-
-        if (game != undefined) {
-            res.json(game)
-        } else {
-            res.sendStatus(204)
-        }
+        db.findByPk(id).then(game => {
+            if (game != undefined) {
+                res.json(game)
+            } else {
+                res.sendStatus(204)
+            }
+        })
     }
 })
 
 router.post("/games", (req, res) => {
 
-    let { id, title, price, year } = req.body
+    let { title, price, year } = req.body
 
-    if (isNaN(id) || id < 0 || isNaN(price) || price < 0 || isNaN(year) || year < 1900 || title === "" || typeof (title) !== "string") {
+    if (isNaN(price) || price < 0 || isNaN(year) || year < 1900 || title === "" || typeof (title) !== "string") {
         res.sendStatus(204)
     } else {
-        db.games.push({
-            id,
-            title,
-            year,
-            price
+        db.create({
+            title: title,
+            year: year,
+            price: price
+        }).then(() => {
+            res.sendStatus(201)
         })
-        res.sendStatus(201)
     }
-
 })
 
 router.delete("/games/:id", (req, res) => {
@@ -47,13 +48,14 @@ router.delete("/games/:id", (req, res) => {
         res.sendStatus(400)
     } else {
         let id = parseInt(req.params.id)
-        let index = db.games.findIndex(g => g.id == id)
+        let game = db.findByPk(id)
 
-        if (index == -1) {
+        if(game != undefined){
+            db.destroy({ where: {id: id} }).then(() => {
+                res.sendStatus(200)
+            })
+        }else{
             res.sendStatus(204)
-        } else {
-            db.games.splice(index, 1)
-            res.sendStatus(200)
         }
     }
 })
@@ -63,33 +65,33 @@ router.put("/games/:id", (req, res) => {
         res.sendStatus(400)
     } else {
         let id = parseInt(req.params.id)
-        let game = db.games.find(g => g.id == id)
-
-        if (game != undefined) {
-            let {title, price, year } = req.body
-
-            if(title != undefined){
-                if(title === "" || typeof(title) !== "string"){
-                    res.sendStatus(204)
+        db.findByPk(id).then(game => {
+            if (game != undefined) {
+                let {title, price, year} = req.body
+    
+                if(title != undefined){
+                    if(title === "" || typeof(title) !== "string"){
+                        res.sendStatus(204)
+                    }
+                    game.update({ title: title })
                 }
-                game.title = title
-            }
-            if(year != undefined){
-                if(isNaN(year) || year < 1900){
-                    res.sendStatus(204)
+                if(year != undefined){
+                    if(isNaN(year) || year < 1900){
+                        res.sendStatus(204)
+                    }
+                    game.update({ year: year })
                 }
-                game.year = year
-            }
-            if(price != undefined){
-                if(isNaN(price) || price < 0){
-                    res.sendStatus(204)
+                if(price != undefined){
+                    if(isNaN(price) || price < 0){
+                        res.sendStatus(204)
+                    }
+                    game.update({ price: price })
                 }
-                game.price = price
+                res.sendStatus(200)
+            } else {
+                res.sendStatus(204)
             }
-            res.sendStatus(200)
-        } else {
-            res.sendStatus(204)
-        }
+        })
     }
 })
 
