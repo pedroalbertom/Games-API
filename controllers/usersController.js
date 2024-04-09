@@ -13,8 +13,27 @@ const jwtSecret = process.env.JWT_SECRET
 
 // rota READ
 router.get("/users", auth, (req, res) => {
+
+    let HATEOAS = [
+        {
+            href: `http://localhost:${process.env.PORT}/users/0`,
+            method: "GET",
+            rel: "get_user_id"
+        },
+        {
+            href: `http://localhost:${process.env.PORT}/auth`,
+            method: "POST",
+            rel: "login"
+        },
+        {
+            href: `http://localhost:${process.env.PORT}/users/0`,
+            method: "DELETE",
+            rel: "delete_user_id"
+        },
+    ]
+
     db.findAll().then(users => {
-        res.json({users: users, loggedUser: req.loggedUser})
+        res.json({users: users, _links: HATEOAS, loggedUser: req.loggedUser})
     })
 })
 
