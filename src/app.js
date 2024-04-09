@@ -9,7 +9,6 @@ const cors = require("cors")
 // importando e inicializando a config do .env
 require("dotenv").config()
 
-
 // setando o express para usar o cors
 app.use(cors())
 // Essa linha habilita o middleware express.urlencoded, que é um middleware incorporado no Express.js para lidar com dados enviados via formulários HTML usando o método POST.

@@ -2,11 +2,19 @@
 const router = require("express").Router()
 // importando o model do banco de dados dos jogos
 const db = require("../models/usersModel")
+// importando os middlewares
+const auth = require("../middlewares/auth")
+// importando e inicializando a config do .env
+require("dotenv").config()
+// importando o JWT
+const jwt = require("jsonwebtoken")
+
+const jwtSecret = process.env.JWT_SECRET
 
 // rota READ
-router.get("/users", (req, res) => {
+router.get("/users", auth, (req, res) => {
     db.findAll().then(users => {
-        res.json(users)
+        res.json({users: users, loggedUser: req.loggedUser})
     })
 })
 
@@ -108,7 +116,13 @@ router.post("/auth", (req, res) => {
         db.findOne({where: {email:  email}}).then(user => {
             if(user != undefined){
                 if(user.password == password){
-                    res.status(200).json({token: "@#$%WDFGwefg234562ewrfG@$%fweqrt"})
+                    jwt.sign({ id: user.id, email: user.email}, jwtSecret, {expiresIn: "48h"}, (err, token) => {
+                        if(err){
+                            res.status(400).json({err: "Falha interna"})
+                        }else{
+                            res.status(200).json({token: token})
+                        }
+                    })
                 }else{
                     res.status(401).json({err: "Credenciais inválidas!"})
                 }
