@@ -3,22 +3,22 @@ const Sequelize = require("sequelize")
 // instanciando a conexão com o banco de dados
 const connection = require("../config/db_connection")
 
-const Games = connection.define('games', {
-    title: {
+const Users = connection.define('users', {
+    name: {
         type: Sequelize.STRING,
         allowNull: false
     },
-    year: {
-        type: Sequelize.INTEGER,
+    email: {
+        type: Sequelize.STRING,
         allowNull: false
     },
-    price: {
-        type: Sequelize.FLOAT,
+    password: {
+        type: Sequelize.STRING,
         allowNull: false
     }
 })
 
 // se a tabela já existir, ele não força a criação novamente, se ela não existir ele cria.
-Games.sync({force: false}).then(() => {console.log("Tabela games criada!")})
+Users.sync({force: false}).then(() => {console.log("Tabela users criada!")})
 
-module.exports = Games
+module.exports = Users

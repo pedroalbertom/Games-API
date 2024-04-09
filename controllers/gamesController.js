@@ -1,16 +1,16 @@
+// instanciando o router do express
 const router = require("express").Router()
+// importando o model do banco de dados dos jogos
 const db = require("../models/gamesModel")
 
-router.get("/", (req, res) => {
-    res.send("Hello World!")
-})
-
+// rota READ
 router.get("/games", (req, res) => {
     db.findAll().then(games => {
         res.json(games)
     })
 })
 
+// rota READ ID
 router.get("/games/:id", (req, res) => {
     if (isNaN(req.params.id)) {
         res.sendStatus(400)
@@ -26,6 +26,7 @@ router.get("/games/:id", (req, res) => {
     }
 })
 
+// rota CREATE
 router.post("/games", (req, res) => {
 
     let { title, price, year } = req.body
@@ -43,6 +44,7 @@ router.post("/games", (req, res) => {
     }
 })
 
+// rota DELETE
 router.delete("/games/:id", (req, res) => {
     if (isNaN(req.params.id)) {
         res.sendStatus(400)
@@ -60,6 +62,7 @@ router.delete("/games/:id", (req, res) => {
     }
 })
 
+// rota UPDATE
 router.put("/games/:id", (req, res) => {
     if (isNaN(req.params.id)) {
         res.sendStatus(400)
