@@ -12,7 +12,7 @@ const jwt = require("jsonwebtoken")
 const jwtSecret = process.env.JWT_SECRET
 
 // rota READ
-router.get("/users", auth, (req, res) => {
+router.get("/users", (req, res) => {
 
     let HATEOAS = [
         {
@@ -21,14 +21,24 @@ router.get("/users", auth, (req, res) => {
             rel: "get_user_id"
         },
         {
-            href: `http://localhost:${process.env.PORT}/auth`,
+            href: `http://localhost:${process.env.PORT}/users`,
             method: "POST",
-            rel: "login"
+            rel: "create_user"
+        },
+        {
+            href: `http://localhost:${process.env.PORT}/users/0`,
+            method: "PUT",
+            rel: "update_user_id"
         },
         {
             href: `http://localhost:${process.env.PORT}/users/0`,
             method: "DELETE",
             rel: "delete_user_id"
+        },
+        {
+            href: `http://localhost:${process.env.PORT}/auth`,
+            method: "POST",
+            rel: "login"
         },
     ]
 
@@ -38,7 +48,7 @@ router.get("/users", auth, (req, res) => {
 })
 
 // rota READ ID
-router.get("/users/:id", (req, res) => {
+router.get("/users/:id", auth, (req, res) => {
     if (isNaN(req.params.id)) {
         res.sendStatus(400)
     } else {
@@ -54,7 +64,7 @@ router.get("/users/:id", (req, res) => {
 })
 
 // rota CREATE
-router.post("/users", (req, res) => {
+router.post("/users", auth, (req, res) => {
 
     let { name, email, password } = req.body
 
@@ -72,7 +82,7 @@ router.post("/users", (req, res) => {
 })
 
 // rota DELETE
-router.delete("/users/:id", (req, res) => {
+router.delete("/users/:id", auth, (req, res) => {
     if (isNaN(req.params.id)) {
         res.sendStatus(400)
     } else {
@@ -90,7 +100,7 @@ router.delete("/users/:id", (req, res) => {
 })
 
 // rota UPDATE
-router.put("/users/:id", (req, res) => {
+router.put("/users/:id", auth, (req, res) => {
     if (isNaN(req.params.id)) {
         res.sendStatus(400)
     } else {
